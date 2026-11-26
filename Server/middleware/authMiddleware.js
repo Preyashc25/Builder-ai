@@ -1,0 +1,20 @@
+import jwt from "jsonwebtoken";
+
+export function authMiddleware(req, res, next) {
+  const token = req.cookies.token;
+  if (!token) {
+    res.status(401).json({ error: "Access denied. No session token provided" });
+  }
+  try {
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || "preyash_secret",
+    );
+    req.user = decoded;
+    next();
+  } catch (error) {
+    res
+      .status(401)
+      .json({ error: "Session expired or Invalid .Please sign in again" });
+  }
+}
